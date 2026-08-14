@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: workforce_hub
+      POSTGRES_USER: workforce
+      POSTGRES_PASSWORD: workforce_dev
+    ports: ["5432:5432"]
+    volumes: [postgres_data:/var/lib/postgresql/data, ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql]
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql://workforce:workforce_dev@db:5432/workforce_hub
+      JWT_SECRET: change-me-in-production
+      PORT: 5000
+    ports: ["5000:5000"]
+    depends_on: [db]
+volumes: { postgres_data: {} }
